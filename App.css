@@ -1,0 +1,427 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.calculator {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 800px;
+}
+
+h1 {
+  color: #1a73e8;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+h3 {
+  color: #1a73e8;
+  margin: 1.5rem 0 1rem;
+  font-size: 1.2rem;
+  text-align: left;
+}
+
+.input-container {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  font-weight: 500;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+input, select {
+  width: 99%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+input::placeholder {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+}
+
+button {
+  width: 100%;
+  padding: 1rem 2rem;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #1557b0;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.result {
+  background-color: #e8f0fe;
+  border-left: 4px solid #1a73e8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.result h2 {
+  color: #1a73e8;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.result p {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(26,115,232,0.1);
+  font-size: 1rem;
+}
+
+.result p:last-child {
+  border-bottom: none;
+}
+
+.result p span:first-child {
+  color: #444;
+  font-weight: 500;
+}
+
+.result p span:last-child {
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 0;
+    min-height: 100vh;
+    background-color: #fff;
+  }
+
+  .calculator {
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .input-container {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0;
+    margin: 0 -1rem 1rem -1rem;
+  }
+
+  .input-group {
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  }
+
+  label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+
+  input, select {
+    padding: 0.75rem;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+
+  input::placeholder {
+    font-size: 14px;
+  }
+
+  button {
+    margin: 0.5rem 1rem;
+    width: calc(100% - 2rem);
+    padding: 0.875rem;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+
+  .result {
+    margin: 1rem -1rem 0 -1rem;
+    padding: 1rem;
+    border-radius: 0;
+    border-left: none;
+    border-top: 4px solid #1a73e8;
+  }
+
+  .result h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .result p {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .result p span:first-child {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .result p span:last-child {
+    color: #1a73e8;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 320px) {
+  .calculator {
+    padding: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .input-group {
+    padding: 0 0.75rem;
+  }
+
+  input, select, button {
+    padding: 0.7rem;
+  }
+
+  .result {
+    margin-top: 0.75rem;
+  }
+
+  .result p {
+    padding: 0.6rem 0.75rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .calculator {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .input-group {
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (hover: none) {
+  input, select, button {
+    touch-action: manipulation;
+  }
+
+  button:active {
+    opacity: 0.9;
+  }
+
+  input:focus, select:focus {
+    box-shadow: none;
+  }
+}
+
+.tariff-type-selector {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.tariff-type-selector select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.tariff-type-selector select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+}
+
+.formulas {
+  background-color: #e8f0fe;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: left;
+  border-left: 4px solid #1a73e8;
+}
+
+.formulas p {
+  margin: 0.8rem 0;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  color: #1557b0;
+  line-height: 1.4;
+}
+
+input[type="number"] {
+  width: 95%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.label-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.formula {
+  color: #083a7c;
+  font-weight: bold;
+  font-size: 1rem;
+  opacity: 1;
+  white-space: nowrap;
+  margin-right: 1rem;
+}
+
+@media (max-width: 768px) {
+  .label-container {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .formula {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: bold;
+  }
+
+  .input-group {
+    margin-bottom: 1.2rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .label-container {
+    gap: 0.15rem;
+  }
+
+  .formula {
+    font-weight: bold;
+    font-size: 0.75rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+
+
+  @media (max-width: 768px) {
+    .formula {
+    font-weight: bold;
+    color: #0b3252;
+   
+    }
+  }
+}
