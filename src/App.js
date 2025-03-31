@@ -14,6 +14,9 @@ function App() {
     worldPrice: '', // світова ціна Pw
     actualTariff: '', // фактичне мито
     tariffType: 'import', // тип мита
+    worldSupplySlope: '', // кутовий коефіцієнт світової пропозиції
+    worldDemandSlope: '', // новий параметр - кутовий коефіцієнт світового попиту
+    importTariffRate: '', // новий параметр - розмір ввізного мита
   });
 
   const [result, setResult] = useState(null);
@@ -23,114 +26,121 @@ function App() {
     setValues(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateInputs = (k, a, b, c, Pw, T) => {
-    if (isNaN(k) || isNaN(a) || isNaN(b) || isNaN(c) || isNaN(Pw) || isNaN(T)) {
+  const validateInputs = (k, a, b, c, Pw, T, bw, kw, t) => {
+    if (isNaN(k) || isNaN(a) || isNaN(b) || isNaN(c) || isNaN(Pw) || isNaN(T) || isNaN(bw) || isNaN(kw) || isNaN(t)) {
       return "Усі поля повинні бути заповнені числовими значеннями.";
     }
     if (k <= 0) return "Нахил попиту (k) повинен бути додатним.";
-    if (a < 0) return "Вільний член попиту (a) не може бути від’ємним.";
-    if (b < 0) return "Коефіцієнт при ціні в пропозиції (b) не може бути від’ємним.";
-    if (b + k === 0) return "Сума нахилів (k + b) не може дорівнювати 0.";
-    if (Pw < 0 || T < 0) return "Світова ціна та мито не можуть бути від’ємними.";
+    if (b <= 0) return "Коефіцієнт при ціні в пропозиції (b) повинен бути додатним.";
+    if (bw <= 0) return "Кутовий коефіцієнт світової пропозиції (bw) повинен бути додатним.";
+    if (kw <= 0) return "Кутовий коефіцієнт світового попиту (kw) повинен бути додатним.";
+    if (t < 0) return "Розмір ввізного мита не може бути від'ємним.";
+    if (k + b === 0) return "Сума нахилів (k + b) не може дорівнювати 0.";
+    if (Pw < 0 || T < 0) return "Світова ціна та мито не можуть бути від'ємними.";
     return null;
   };
-
+  
   const calculateResults = () => {
     try {
-      const k = parseFloat(values.demandK);     // нахил попиту
-      const a = parseFloat(values.demandA);     // вільний член попиту
-      const b = parseFloat(values.supplyB);     // коефіцієнт при ціні в пропозиції
-      const c = parseFloat(values.supplyC);     // вільний член пропозиції
-      const Pw = parseFloat(values.worldPrice); // світова ціна
-      const T = parseFloat(values.actualTariff); // фактичне мито
+      const k = parseFloat(values.demandK);
+      const a = parseFloat(values.demandA);
+      const b = parseFloat(values.supplyB);
+      const c = parseFloat(values.supplyC);
+      const Pw = parseFloat(values.worldPrice);
+      const T = parseFloat(values.actualTariff);
+      const bw = parseFloat(values.worldSupplySlope);
+      const kw = parseFloat(values.worldDemandSlope);
+      const t = parseFloat(values.importTariffRate);
       const isImport = values.tariffType === 'import';
-
-      // Валідація введених даних
-      const validationError = validateInputs(k, a, b, c, Pw, T);
+  
+      const validationError = validateInputs(k, a, b, c, Pw, T, bw, kw, t);
       if (validationError) {
         alert(validationError);
         return;
       }
-
-      // Автоматичне визначення одиниць залежно від типу мита
+  
       const priceUnit = isImport ? 'тис. дол' : 'дол';
       const quantityUnit = isImport ? 'тис. од' : 'млн т';
-
-      // Розрахунок внутрішньої рівноважної ціни (автаркії)
+  
       const domesticPrice = (a + c) / (k + b);
-
-      // Перевірка, чи автаркічна ціна додатна
       if (domesticPrice <= 0) {
-        alert("Автаркічна ціна не може бути від’ємною або дорівнювати нулю. Перевірте параметри.");
+        alert("Автаркічна ціна не може бути від'ємною або дорівнювати нулю.");
         return;
       }
-
-      // Розрахунок обсягів при рівноважній ціні
+  
       const domesticDemand = -k * domesticPrice + a;
       const domesticSupply = b * domesticPrice - c;
-
-      // Перевірка, чи попит і пропозиція невід’ємні при автаркічній ціні
       if (domesticDemand < 0 || domesticSupply < 0) {
-        alert("Попит або пропозиція при автаркічній ціні не можуть бути від’ємними. Перевірте параметри.");
+        alert("Попит або пропозиція в автаркії не можуть бути від'ємними.");
         return;
       }
-
-      // Розрахунок оптимального мита
-      let optimalTariff;
-      if (isImport) {
-        // Для імпортного мита
-        optimalTariff = domesticPrice > Pw ? domesticPrice - Pw : 0;
-      } else {
-        // Для експортного мита
-        optimalTariff = Pw > domesticPrice ? Pw - domesticPrice : 0;
-      }
-
-      // Різниця між оптимальним і фактичним митом
-      const tariffDifference = Math.abs(optimalTariff - T);
-
-      // Розрахунок обсягів торгівлі при світовій ціні
-      const tradeDemand = -k * Pw + a;
-      const tradeSupply = b * Pw - c;
-
-      // Перевірка, чи попит і пропозиція невід’ємні при світовій ціні
-      if (tradeDemand < 0 || tradeSupply < 0) {
-        alert("Попит або пропозиція при світовій ціні не можуть бути від’ємними. Перевірте параметри.");
-        return;
-      }
-
-      const tradeVolume = isImport 
-        ? Math.max(tradeDemand - tradeSupply, 0)  // для імпорту
-        : Math.max(tradeSupply - tradeDemand, 0); // для експорту
-
-      // Розрахунок обсягів торгівлі з урахуванням мита
+  
+      const worldSupply = bw * Pw;
+      const worldDemand = kw * Pw;
+  
+      // Обчислюємо попит і пропозицію при світовій ціні, але обмежуємо від'ємні значення
+      let tradeDemand = Math.max(-k * Pw + a, 0); // Обмежуємо попит
+      let tradeSupply = Math.max(b * Pw - c, 0);  // Обмежуємо пропозицію
+  
+      const tradeVolumeNoTariff = isImport 
+        ? Math.max(tradeDemand - tradeSupply, 0)
+        : Math.max(tradeSupply - tradeDemand, 0);
+  
       const adjustedPrice = isImport ? Pw + T : Pw - T;
       if (adjustedPrice < 0) {
-        alert("Ціна з урахуванням мита не може бути від’ємною. Перевірте параметри.");
+        alert("Ціна з урахуванням мита не може бути від'ємною.");
         return;
       }
-
-      const tradeDemandWithTariff = -k * adjustedPrice + a;
-      const tradeSupplyWithTariff = b * adjustedPrice - c;
-
-      // Перевірка, чи попит і пропозиція невід’ємні з урахуванням мита
-      if (tradeDemandWithTariff < 0 || tradeSupplyWithTariff < 0) {
-        alert("Попит або пропозиція з урахуванням мита не можуть бути від’ємними. Перевірте параметри.");
-        return;
-      }
-
+  
+      const tradeDemandWithTariff = Math.max(-k * adjustedPrice + a, 0);
+      const tradeSupplyWithTariff = Math.max(b * adjustedPrice - c, 0);
+  
       const tradeVolumeWithTariff = isImport 
         ? Math.max(tradeDemandWithTariff - tradeSupplyWithTariff, 0)
         : Math.max(tradeSupplyWithTariff - tradeDemandWithTariff, 0);
-
+  
+      const adjustedPriceWithRate = isImport ? Pw + (t * Pw) : Pw - (t * Pw);
+      if (adjustedPriceWithRate < 0) {
+        alert("Ціна з урахуванням тарифної ставки не може бути від'ємною.");
+        return;
+      }
+  
+      const tradeDemandWithRate = Math.max(-k * adjustedPriceWithRate + a, 0);
+      const tradeSupplyWithRate = Math.max(b * adjustedPriceWithRate - c, 0);
+  
+      const tradeVolumeWithRate = isImport 
+        ? Math.max(tradeDemandWithRate - tradeSupplyWithRate, 0)
+        : Math.max(tradeSupplyWithRate - tradeDemandWithRate, 0);
+  
+      const Ed = -k * (domesticPrice / domesticDemand);
+      const Es = b * (domesticPrice / domesticSupply);
+      const Ew = kw * (Pw / worldDemand);
+      const Esw = bw * (Pw / worldSupply);
+  
+      let optimalTariff;
+      if (isImport) {
+        optimalTariff = tradeVolumeNoTariff > 0 ? (1 / Math.abs(Esw)) * Pw : 0;
+      } else {
+        optimalTariff = tradeVolumeNoTariff > 0 ? (1 / Math.abs(Ew)) * Pw : 0;
+      }
+  
+      const tariffAmount = t * Pw;
+      const tariffDifference = Math.abs(optimalTariff - T);
+  
       setResult({
         'Внутрішня рівноважна ціна': `${domesticPrice.toFixed(2)} ${priceUnit}`,
         'Оптимальне мито': `${optimalTariff.toFixed(2)} ${priceUnit}`,
+        'Розмір ввізного мита': `${(t * 100).toFixed(1)}%`,
+        'Сума ввізного мита': `${tariffAmount.toFixed(2)} ${priceUnit}`,
         'Фактичне мито': `${T.toFixed(2)} ${priceUnit}`,
         'Різниця між оптимальним і фактичним митом': `${tariffDifference.toFixed(2)} ${priceUnit}`,
         'Внутрішній попит (автаркія)': `${domesticDemand.toFixed(2)} ${quantityUnit}`,
         'Внутрішня пропозиція (автаркія)': `${domesticSupply.toFixed(2)} ${quantityUnit}`,
-        [isImport ? 'Обсяг імпорту (без мита)' : 'Обсяг експорту (без мита)']: `${tradeVolume.toFixed(2)} ${quantityUnit}`,
+        'Світовий попит при Pw': `${worldDemand.toFixed(2)} ${quantityUnit}`,
+        'Світова пропозиція при Pw': `${worldSupply.toFixed(2)} ${quantityUnit}`,
+        [isImport ? 'Обсяг імпорту (без мита)' : 'Обсяг експорту (без мита)']: `${tradeVolumeNoTariff.toFixed(2)} ${quantityUnit}`,
         [isImport ? 'Обсяг імпорту (з митом)' : 'Обсяг експорту (з митом)']: `${tradeVolumeWithTariff.toFixed(2)} ${quantityUnit}`,
+        [isImport ? 'Обсяг імпорту (з тарифною ставкою)' : 'Обсяг експорту (з тарифною ставкою)']: `${tradeVolumeWithRate.toFixed(2)} ${quantityUnit}`,
       });
     } catch (error) {
       alert('Помилка в розрахунках. Перевірте введені дані.');
@@ -142,31 +152,55 @@ function App() {
       name: 'demandK', 
       label: 'Нахил функції попиту (k)', 
       placeholder: 'Наприклад: 1 або 2',
+      formula: 'Dd = -kPd + a'
     },
     { 
       name: 'demandA', 
       label: 'Вільний член функції попиту (a)', 
       placeholder: 'Наприклад: 600 або 5',
+      formula: 'Dd = -kPd + a'
     },
     { 
       name: 'supplyB', 
       label: 'Коефіцієнт при ціні в пропозиції (b)', 
       placeholder: 'Наприклад: 3 або 1',
+      formula: 'Sd = bPd - c'
     },
     { 
       name: 'supplyC', 
       label: 'Вільний член функції пропозиції (c)', 
       placeholder: 'Наприклад: 100 або 1',
+      formula: 'Sd = bPd - c'
     },
     { 
       name: 'worldPrice', 
       label: 'Світова ціна (Pw)', 
       placeholder: 'Наприклад: 210 або 2',
+      formula: values.tariffType === 'import' ? 't* = Pd - Pw' : 't* = Pw - Pd'
+    },
+    { 
+      name: 'worldSupplySlope', 
+      label: 'Кутовий коефіцієнт світової пропозиції (bw)', 
+      placeholder: 'Наприклад: 0.5 або 2',
+      formula: 'Sw = bw * Pw'
+    },
+    { 
+      name: 'worldDemandSlope', 
+      label: 'Кутовий коефіцієнт світового попиту (kw)', 
+      placeholder: 'Наприклад: 0.5 або 2',
+      formula: 'Dw = kw * Pw'
+    },
+    { 
+      name: 'importTariffRate', 
+      label: 'Розмір ввізного мита (t)', 
+      placeholder: 'Наприклад: 0.2 або 0.3',
+      formula: 'T = t * Pw'
     },
     { 
       name: 'actualTariff', 
       label: 'Фактичне мито (T)', 
       placeholder: 'Наприклад: 15 або 0.5',
+      formula: 'Різниця = |t* - T|'
     },
   ];
 
@@ -185,7 +219,10 @@ function App() {
           </div>
           {inputFields.map((field, index) => (
             <div className="input-group" key={index}>
-              <label>{field.label}:</label>
+              <div className="label-container">
+                <label>{field.label}</label>
+                <span className="formula">{field.formula}</span>
+              </div>
               <input
                 type="number"
                 name={field.name}
