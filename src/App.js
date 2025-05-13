@@ -33,91 +33,92 @@ function App() {
     return null;
   };
 
-  const calculateResults = () => {
-    try {
-      const k = parseFloat(values.demandK);
-      const a = parseFloat(values.demandA);
-      const b = parseFloat(values.supplyB);
-      const c = parseFloat(values.supplyC);
-      const Pw = parseFloat(values.worldPrice);
-      const bw = parseFloat(values.worldSupplySlope);
-      const t = parseFloat(values.importTariffRate);
-      const isImport = values.tariffType === 'import';
+const calculateResults = () => {
+  try {
+    const k = parseFloat(values.demandK);
+    const a = parseFloat(values.demandA);
+    const b = parseFloat(values.supplyB);
+    const c = parseFloat(values.supplyC);
+    const Pw = parseFloat(values.worldPrice);
+    const bw = parseFloat(values.worldSupplySlope);
+    const t = parseFloat(values.importTariffRate);
+    const isImport = values.tariffType === 'import';
 
-      const validationError = validateInputs(k, a, b, c, Pw, bw, t);
-      if (validationError) {
-        alert(validationError);
-        return;
-      }
-
-      const priceUnit = isImport ? 'тис. дол' : 'дол';
-      const quantityUnit = isImport ? 'тис. од' : 'млн т';
-
-      const domesticPrice = (a + c) / (k + b);
-      if (domesticPrice <= 0) {
-        alert("Автаркічна ціна не може бути від'ємною або дорівнювати нулю.");
-        return;
-      }
-
-      const domesticDemand = -k * domesticPrice + a;
-      const domesticSupply = b * domesticPrice - c;
-      if (domesticDemand < 0 || domesticSupply < 0) {
-        alert("Попит або пропозиція в автаркії не можуть бути від'ємними.");
-        return;
-      }
-
-      const worldSupply = bw * Pw;
-
-      let tradeDemand = Math.max(-k * Pw + a, 0);
-      let tradeSupply = Math.max(b * Pw - c, 0);
-
-      const tradeVolumeNoTariff = isImport
-        ? Math.max(tradeDemand - tradeSupply, 0)
-        : Math.max(tradeSupply - tradeDemand, 0);
-
-      const adjustedPriceWithRate = isImport ? Pw + (t * Pw) : Pw - (t * Pw);
-      if (adjustedPriceWithRate < 0) {
-        alert("Ціна з урахуванням тарифної ставки не може бути від'ємною.");
-        return;
-      }
-
-      const tradeDemandWithRate = Math.max(-k * adjustedPriceWithRate + a, 0);
-      const tradeSupplyWithRate = Math.max(b * adjustedPriceWithRate - c, 0);
-
-      const tradeVolumeWithRate = isImport
-        ? Math.max(tradeDemandWithRate - tradeSupplyWithRate, 0)
-        : Math.max(tradeSupplyWithRate - tradeDemandWithRate, 0);
-
-      const tariffAmount = t * Pw;
-
-      // Оптимальне мито (з зошита): t_0^* = (a + c - (k + b) * Pw) / (2 * (k + b))
-      // У прикладі: M = -k * (Pw + t_0) + a - (b * (Pw + t_0) - c) = -(k + b) * (Pw + t_0) + (a + c)
-      // C = M * t_0, dC/dt_0 = 0 дає t_0^* = (a + c - (k + b) * Pw) / (2 * (k + b))
-      let optimalTariff = (a + c - (k + b) * Pw) / (2 * (k + b));
-      optimalTariff = Math.max(optimalTariff, 0);
-
-      // Внутрішні попит і пропозиція при Pw
-      const demandAtPw = Math.max(-k * Pw + a, 0);
-      const supplyAtPw = Math.max(b * Pw - c, 0);
-
-      setResult({
-        'Внутрішня рівноважна ціна': `${domesticPrice.toFixed(2)} ${priceUnit}`,
-        'Оптимальне мито': `${optimalTariff.toFixed(2)} ${priceUnit}`,
-        'Розмір ввізного мита': `${(t * 100).toFixed(1)}%`,
-        'Сума ввізного мита': `${tariffAmount.toFixed(2)} ${priceUnit}`,
-        'Внутрішній попит (автаркія)': `${domesticDemand.toFixed(2)} ${quantityUnit}`,
-        'Внутрішня пропозиція (автаркія)': `${domesticSupply.toFixed(2)} ${quantityUnit}`,
-        'Внутрішній попит при Pw': `${demandAtPw.toFixed(2)} ${quantityUnit}`,
-        'Внутрішня пропозиція при Pw': `${supplyAtPw.toFixed(2)} ${quantityUnit}`,
-        'Світова пропозиція при Pw': `${worldSupply.toFixed(2)} ${quantityUnit}`,
-        [isImport ? 'Обсяг імпорту (без мита)' : 'Обсяг експорту (без мита)']: `${tradeVolumeNoTariff.toFixed(2)} ${quantityUnit}`,
-        [isImport ? 'Обсяг імпорту (з тарифною ставкою)' : 'Обсяг експорту (з тарифною ставкою)']: `${tradeVolumeWithRate.toFixed(2)} ${quantityUnit}`,
-      });
-    } catch (error) {
-      alert('Помилка в розрахунках. Перевірте введені дані.');
+    const validationError = validateInputs(k, a, b, c, Pw, bw, t);
+    if (validationError) {
+      alert(validationError);
+      return;
     }
-  };
 
+    const priceUnit = isImport ? 'тис. дол' : 'дол';
+    const quantityUnit = isImport ? 'тис. од' : 'млн т';
+
+    const domesticPrice = (a + c) / (k + b);
+    if (domesticPrice <= 0) {
+      alert("Автаркічна ціна не може бути від'ємною або дорівнювати нулю.");
+      return;
+    }
+
+    const domesticDemand = -k * domesticPrice + a;
+    const domesticSupply = b * domesticPrice - c;
+    if (domesticDemand < 0 || domesticSupply < 0) {
+      alert("Попит або пропозиція в автаркії не можуть бути від'ємними.");
+      return;
+    }
+
+    const worldSupply = bw * Pw;
+
+    let tradeDemand = Math.max(-k * Pw + a, 0);
+    let tradeSupply = Math.max(b * Pw - c, 0);
+
+    const tradeVolumeNoTariff = isImport
+      ? Math.max(tradeDemand - tradeSupply, 0)
+      : Math.max(tradeSupply - tradeDemand, 0);
+
+    const adjustedPriceWithRate = isImport ? Pw + (t * Pw) : Pw - (t * Pw);
+    if (adjustedPriceWithRate < 0) {
+      alert("Ціна з урахуванням тарифної ставки не може бути від'ємною.");
+      return;
+    }
+
+    const tradeDemandWithRate = Math.max(-k * adjustedPriceWithRate + a, 0);
+    const tradeSupplyWithRate = Math.max(b * adjustedPriceWithRate - c, 0);
+
+    const tradeVolumeWithRate = isImport
+      ? Math.max(tradeDemandWithRate - tradeSupplyWithRate, 0)
+      : Math.max(tradeSupplyWithRate - tradeDemandWithRate, 0);
+
+    const tariffAmount = t * Pw;
+
+    // Calculate optimal tariff rate (t_0^*)
+    let optimalTariffRate = (a + c - (k + b) * Pw) / (2 * (k + b));
+    // Ensure optimal tariff rate is non-negative and within a reasonable range (0 to 1)
+    optimalTariffRate = Math.max(0, Math.min(1, optimalTariffRate));
+
+    // Convert to absolute value or percentage based on context
+    const optimalTariff = isImport ? optimalTariffRate * Pw : optimalTariffRate * Pw; // Adjust based on tariff type
+
+    // Внутрішні попит і пропозиція при Pw
+    const demandAtPw = Math.max(-k * Pw + a, 0);
+    const supplyAtPw = Math.max(b * Pw - c, 0);
+
+    setResult({
+      'Внутрішня рівноважна ціна': `${domesticPrice.toFixed(2)} ${priceUnit}`,
+      'Оптимальне мито': `${(optimalTariff * 100).toFixed(2)}%`, // Display as percentage
+      'Розмір ввізного мита': `${(t * 100).toFixed(1)}%`,
+      'Сума ввізного мита': `${tariffAmount.toFixed(2)} ${priceUnit}`,
+      'Внутрішній попит (автаркія)': `${domesticDemand.toFixed(2)} ${quantityUnit}`,
+      'Внутрішня пропозиція (автаркія)': `${domesticSupply.toFixed(2)} ${quantityUnit}`,
+      'Внутрішній попит при Pw': `${demandAtPw.toFixed(2)} ${quantityUnit}`,
+      'Внутрішня пропозиція при Pw': `${supplyAtPw.toFixed(2)} ${quantityUnit}`,
+      'Світова пропозиція при Pw': `${worldSupply.toFixed(2)} ${quantityUnit}`,
+      [isImport ? 'Обсяг імпорту (без мита)' : 'Обсяг експорту (без мита)']: `${tradeVolumeNoTariff.toFixed(2)} ${quantityUnit}`,
+      [isImport ? 'Обсяг імпорту (з тарифною ставкою)' : 'Обсяг експорту (з тарифною ставкою)']: `${tradeVolumeWithRate.toFixed(2)} ${quantityUnit}`,
+    });
+  } catch (error) {
+    alert('Помилка в розрахунках. Перевірте введені дані.');
+  }
+};
   const inputFields = [
     { 
       name: 'demandK', 
