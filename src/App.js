@@ -88,10 +88,11 @@ const calculateResults = () => {
       ? Math.max(tradeDemandWithRate - tradeSupplyWithRate, 0)
       : Math.max(tradeSupplyWithRate - tradeDemandWithRate, 0);
 
-    const tariffAmount = t * Pw * tradeVolumeWithRate; // Виправлено обчислення суми мита
+    const tariffAmount = t * Pw * tradeVolumeWithRate;
 
     // Обчислення оптимального мита
     let optimalTariffRate;
+    let optimalTariffAbsolute;
     if (Pw < domesticPrice) {
       // Імпортна ситуація
       optimalTariffRate = (a + c - (k + b) * Pw) / (2 * (k + b));
@@ -99,7 +100,8 @@ const calculateResults = () => {
       // Експортна ситуація
       optimalTariffRate = (Pw - domesticPrice) / (2 * Pw);
     }
-    optimalTariffRate = Math.max(0, Math.min(1, optimalTariffRate)); // Обмеження від 0 до 1
+    optimalTariffRate = Math.max(0, Math.min(1, optimalTariffRate));
+    optimalTariffAbsolute = optimalTariffRate * Pw; // Абсолютна величина
 
     // Внутрішні попит і пропозиція при Pw
     const demandAtPw = Math.max(-k * Pw + a, 0);
@@ -107,7 +109,8 @@ const calculateResults = () => {
 
     setResult({
       'Внутрішня рівноважна ціна': `${domesticPrice.toFixed(2)} ${priceUnit}`,
-      'Оптимальне мито': `${(optimalTariffRate * 100).toFixed(2)}%`, // У відсотках
+      'Оптимальне мито (у відсотках)': `${(optimalTariffRate * 100).toFixed(2)}%`,
+      'Оптимальне мито (абсолютне)': `${optimalTariffAbsolute.toFixed(2)} ${priceUnit}/т`,
       'Розмір ввізного мита': `${(t * 100).toFixed(1)}%`,
       'Сума ввізного мита': `${tariffAmount.toFixed(2)} ${priceUnit}`,
       'Внутрішній попит (автаркія)': `${domesticDemand.toFixed(2)} ${quantityUnit}`,
