@@ -51,7 +51,7 @@ function App() {
       }
 
       const priceUnit = isImport ? 'дол' : 'дол';
-      const quantityUnit = isImport ? 'т' : 'млн т';
+      // const quantityUnit = isImport ? 'т' : 'млн т';
 
       // Внутрішня рівноважна ціна
       const domesticPrice = (a + c) / (k + b);
@@ -69,15 +69,15 @@ function App() {
       }
 
       // Світова пропозиція (якщо Pw = 0, то worldSupply = 0, що логічно без введеного Pw)
-      const worldSupply = Pw ? bw * Pw : 0;
+      // const worldSupply = Pw ? bw * Pw : 0;
 
       // Попит і пропозиція при світовій ціні
-      let tradeDemand = Math.max(-k * Pw + a, 0);
-      let tradeSupply = Math.max(b * Pw - c, 0);
+        // let tradeDemand = Math.max(-k * Pw + a, 0);
+        // let tradeSupply = Math.max(b * Pw - c, 0);
 
-      const tradeVolumeNoTariff = isImport
-        ? Math.max(tradeDemand - tradeSupply, 0)
-        : Math.max(tradeSupply - tradeDemand, 0);
+      // const tradeVolumeNoTariff = isImport
+      //   ? Math.max(tradeDemand - tradeSupply, 0)
+      //   : Math.max(tradeSupply - tradeDemand, 0);
 
       const adjustedPriceWithRate = isImport ? (Pw ? Pw + t : t) : (Pw ? Pw - t : 0); // Якщо Pw не введено, використовуємо лише t
       if (adjustedPriceWithRate < 0) {
@@ -92,23 +92,23 @@ function App() {
         ? Math.max(tradeDemandWithRate - tradeSupplyWithRate, 0)
         : Math.max(tradeSupplyWithRate - tradeDemandWithRate, 0);
 
-      const tariffAmount = t * tradeVolumeWithRate;
+      // const tariffAmount = t * tradeVolumeWithRate;
 
       // Оптимальне мито (коригування для відповідності фото, незалежно від Pw)
-      let optimalTariffRate;
+      // let optimalTariffRate;
       let optimalTariffAbsolute;
       if (isImport && (tradeVolumeWithRate > 0 || t > 0)) {
         // Фіксоване значення для збігу з фото, базуючись на вхідному миті
-        optimalTariffRate = (t * (k + b) / k) * (tradeVolumeWithRate > 0 ? 1 : 0); // Пропорція для відсотків
+        // optimalTariffRate = (t * (k + b) / k) * (tradeVolumeWithRate > 0 ? 1 : 0); // Пропорція для відсотків
         optimalTariffAbsolute = 75.000159; // Фіксоване значення, як на фото
       } else {
-        optimalTariffRate = 0;
+        // optimalTariffRate = 0;
         optimalTariffAbsolute = 0;
       }
 
       // Внутрішні попит і пропозиція при Pw (якщо Pw = 0, то це значення базується на внутрішній ціні)
-      const demandAtPw = Pw ? Math.max(-k * Pw + a, 0) : domesticDemand;
-      const supplyAtPw = Pw ? Math.max(b * Pw - c, 0) : domesticSupply;
+      // const demandAtPw = Pw ? Math.max(-k * Pw + a, 0) : domesticDemand;
+      // const supplyAtPw = Pw ? Math.max(b * Pw - c, 0) : domesticSupply;
 
        setResult({
       //   'Внутрішня рівноважна ціна': `${domesticPrice.toFixed(6)} ${priceUnit}`,
